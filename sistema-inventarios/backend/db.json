@@ -1,0 +1,49 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "username": "admin",
+      "password": "password123"
+    }
+  ],
+  "providers": [
+    {
+      "id": 1,
+      "name": "Samsung"
+    },
+    {
+      "id": 2,
+      "name": "LG"
+    },
+    {
+      "id": 3,
+      "name": "Whirlpool"
+    }
+  ],
+  "products": [
+    {
+      "id": 1,
+      "name": "Refrigerador Smart Inverter 312L",
+      "price": 2500000,
+      "size": "170x60x70 cm",
+      "material": "Acero Inoxidable",
+      "stock": 15
+    },
+    {
+      "id": 2,
+      "name": "Lavadora Carga Frontal 12kg",
+      "price": 1800000,
+      "size": "85x60x60 cm",
+      "material": "Plástico y Acero",
+      "stock": 22
+    },
+    {
+      "id": 3,
+      "name": "Horno Microondas 28L",
+      "price": 450000,
+      "size": "30x50x40 cm",
+      "material": "Acero y Vidrio Templado",
+      "stock": 30
+    }
+  ]
+}
