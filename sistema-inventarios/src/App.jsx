@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
-import { Package, Plus, Edit2, Trash2, Search, TrendingUp, TrendingDown, AlertCircle } from 'lucide-react';
+import { Package, Plus, Edit2, Trash2, Search, TrendingUp, TrendingDown, AlertCircle, Truck } from 'lucide-react';
+import GestionProveedores from './GestionProveedores'; // Importamos el nuevo componente
 
 // ============================================
 // COMPONENTE PRINCIPAL DE LA APLICACIÓN
 // ============================================
 export default function App() {
+  const [currentView, setCurrentView] = useState('products'); // 'products' o 'providers'
   // Estado para almacenar todos los productos
   const [products, setProducts] = useState([
     { id: 1, name: 'Laptop Dell XPS 13', category: 'electronics', quantity: 15, price: 1299.99, minStock: 5, sku: 'LAP-001' },
@@ -51,21 +53,21 @@ export default function App() {
   const filteredProducts = products.filter(product => {
     const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
     const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         product.sku.toLowerCase().includes(searchTerm.toLowerCase());
+      product.sku.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesCategory && matchesSearch;
   });
 
   // ============================================
   // FUNCIONES CRUD (Crear, Leer, Actualizar, Eliminar)
   // ============================================
-  
+
   // Agregar nuevo producto
   const handleAddProduct = () => {
     if (!newProduct.name || !newProduct.sku) {
       alert('Por favor completa todos los campos requeridos');
       return;
     }
-    
+
     const product = {
       id: Date.now(),
       ...newProduct,
@@ -90,8 +92,8 @@ export default function App() {
       alert('Por favor completa todos los campos requeridos');
       return;
     }
-    
-    setProducts(products.map(p => 
+
+    setProducts(products.map(p =>
       p.id === editingProduct.id ? {
         ...editingProduct,
         quantity: Number(editingProduct.quantity),
@@ -140,7 +142,7 @@ export default function App() {
   // ============================================
   const Modal = ({ show, onClose, title, children }) => {
     if (!show) return null;
-    
+
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
         <div className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
@@ -260,166 +262,192 @@ export default function App() {
                 <p className="text-blue-100 text-sm">Gestión completa de productos</p>
               </div>
             </div>
-            <button
-              onClick={() => setShowAddModal(true)}
-              className="bg-white text-blue-600 hover:bg-blue-50 font-medium py-2 px-4 rounded-lg flex items-center gap-2 transition-colors"
-            >
-              <Plus size={20} />
-              Agregar Producto
-            </button>
+            <div className="flex items-center gap-4">
+              {/* Botones de Navegación */}
+              <button
+                onClick={() => setCurrentView('products')}
+                className={`font-medium py-2 px-4 rounded-lg flex items-center gap-2 transition-colors ${currentView === 'products' ? 'bg-white text-blue-600' : 'bg-transparent text-white hover:bg-blue-700'}`}
+              >
+                <Package size={20} />
+                Inventario
+              </button>
+              <button
+                onClick={() => setCurrentView('providers')}
+                className={`font-medium py-2 px-4 rounded-lg flex items-center gap-2 transition-colors ${currentView === 'providers' ? 'bg-white text-blue-600' : 'bg-transparent text-white hover:bg-blue-700'}`}
+              >
+                <Truck size={20} />
+                Proveedores
+              </button>
+            </div>
           </div>
         </div>
       </header>
 
       <div className="max-w-7xl mx-auto px-4 py-8">
-        {/* TARJETAS DE ESTADÍSTICAS */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <StatCard
-            title="Total de Productos"
-            value={totalProducts}
-            icon={Package}
-            color="text-blue-600"
-            subtext="En inventario actual"
-          />
-          <StatCard
-            title="Valor Total"
-            value={`$${totalValue.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
-            icon={TrendingUp}
-            color="text-green-600"
-            subtext="Valor del inventario"
-          />
-          <StatCard
-            title="Stock Bajo"
-            value={lowStockItems}
-            icon={AlertCircle}
-            color="text-red-600"
-            subtext="Productos por reabastecer"
-          />
-        </div>
+        {currentView === 'products' ? (
+          <>
+            {/* Botón para agregar producto, ahora aquí */}
+            <div className="flex justify-end mb-6">
+              <button
+                onClick={() => setShowAddModal(true)}
+                className="bg-blue-600 text-white hover:bg-blue-700 font-medium py-2 px-4 rounded-lg flex items-center gap-2 transition-colors shadow-md"
+              >
+                <Plus size={20} />
+                Agregar Producto
+              </button>
+            </div>
 
-        {/* FILTROS Y BÚSQUEDA */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-          <div className="flex flex-col md:flex-row gap-4">
-            {/* Barra de búsqueda */}
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-              <input
-                type="text"
-                placeholder="Buscar por nombre o SKU..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            {/* TARJETAS DE ESTADÍSTICAS */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+              <StatCard
+                title="Total de Productos"
+                value={totalProducts}
+                icon={Package}
+                color="text-blue-600"
+                subtext="En inventario actual"
+              />
+              <StatCard
+                title="Valor Total"
+                value={`$${totalValue.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+                icon={TrendingUp}
+                color="text-green-600"
+                subtext="Valor del inventario"
+              />
+              <StatCard
+                title="Stock Bajo"
+                value={lowStockItems}
+                icon={AlertCircle}
+                color="text-red-600"
+                subtext="Productos por reabastecer"
               />
             </div>
 
-            {/* Filtro de categorías */}
-            <div className="flex gap-2 flex-wrap">
-              {categories.map(cat => (
-                <button
-                  key={cat.id}
-                  onClick={() => setSelectedCategory(cat.id)}
-                  className={`px-4 py-2 rounded-lg font-medium transition-all ${
-                    selectedCategory === cat.id
-                      ? 'bg-blue-600 text-white shadow-md'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
-                >
-                  <span className="mr-2">{cat.icon}</span>
-                  {cat.name}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
+            {/* FILTROS Y BÚSQUEDA */}
+            <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+              <div className="flex flex-col md:flex-row gap-4">
+                {/* Barra de búsqueda */}
+                <div className="flex-1 relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                  <input
+                    type="text"
+                    placeholder="Buscar por nombre o SKU..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
 
-        {/* TABLA DE PRODUCTOS */}
-        <div className="bg-white rounded-lg shadow-md overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Producto</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">SKU</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Categoría</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cantidad</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Precio</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Valor Total</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {filteredProducts.length === 0 ? (
-                  <tr>
-                    <td colSpan="8" className="px-6 py-12 text-center text-gray-500">
-                      <Package className="mx-auto mb-3 text-gray-400" size={48} />
-                      <p className="text-lg font-medium">No se encontraron productos</p>
-                      <p className="text-sm">Intenta con otros filtros o agrega un nuevo producto</p>
-                    </td>
-                  </tr>
-                ) : (
-                  filteredProducts.map(product => (
-                    <tr key={product.id} className="hover:bg-gray-50 transition-colors">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="font-medium text-gray-900">{product.name}</div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="text-sm text-gray-500 font-mono">{product.sku}</span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="text-sm text-gray-600">
-                          {categories.find(c => c.id === product.category)?.name || product.category}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="text-sm font-semibold text-gray-900">{product.quantity}</span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="text-sm text-gray-900">${product.price.toFixed(2)}</span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="text-sm font-semibold text-green-600">
-                          ${(product.quantity * product.price).toFixed(2)}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        {product.quantity <= product.minStock ? (
-                          <span className="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800 flex items-center gap-1 w-fit">
-                            <TrendingDown size={14} />
-                            Stock Bajo
-                          </span>
-                        ) : (
-                          <span className="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800 flex items-center gap-1 w-fit">
-                            <TrendingUp size={14} />
-                            Disponible
-                          </span>
-                        )}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right">
-                        <div className="flex gap-2 justify-end">
-                          <button
-                            onClick={() => handleEditClick(product)}
-                            className="text-blue-600 hover:text-blue-800 p-2 hover:bg-blue-50 rounded-lg transition-colors"
-                            title="Editar"
-                          >
-                            <Edit2 size={18} />
-                          </button>
-                          <button
-                            onClick={() => handleDelete(product.id)}
-                            className="text-red-600 hover:text-red-800 p-2 hover:bg-red-50 rounded-lg transition-colors"
-                            title="Eliminar"
-                          >
-                            <Trash2 size={18} />
-                          </button>
-                        </div>
-                      </td>
+                {/* Filtro de categorías */}
+                <div className="flex gap-2 flex-wrap">
+                  {categories.map(cat => (
+                    <button
+                      key={cat.id}
+                      onClick={() => setSelectedCategory(cat.id)}
+                      className={`px-4 py-2 rounded-lg font-medium transition-all ${selectedCategory === cat.id
+                        ? 'bg-blue-600 text-white shadow-md'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        }`}
+                    >
+                      <span className="mr-2">{cat.icon}</span>
+                      {cat.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* TABLA DE PRODUCTOS */}
+            <div className="bg-white rounded-lg shadow-md overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-gray-50 border-b border-gray-200">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Producto</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">SKU</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Categoría</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cantidad</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Precio</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Valor Total</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
                     </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {filteredProducts.length === 0 ? (
+                      <tr>
+                        <td colSpan="8" className="px-6 py-12 text-center text-gray-500">
+                          <Package className="mx-auto mb-3 text-gray-400" size={48} />
+                          <p className="text-lg font-medium">No se encontraron productos</p>
+                          <p className="text-sm">Intenta con otros filtros o agrega un nuevo producto</p>
+                        </td>
+                      </tr>
+                    ) : (
+                      filteredProducts.map(product => (
+                        <tr key={product.id} className="hover:bg-gray-50 transition-colors">
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="font-medium text-gray-900">{product.name}</div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <span className="text-sm text-gray-500 font-mono">{product.sku}</span>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <span className="text-sm text-gray-600">
+                              {categories.find(c => c.id === product.category)?.name || product.category}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <span className="text-sm font-semibold text-gray-900">{product.quantity}</span>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <span className="text-sm text-gray-900">${product.price.toFixed(2)}</span>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <span className="text-sm font-semibold text-green-600">
+                              ${(product.quantity * product.price).toFixed(2)}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            {product.quantity <= product.minStock ? (
+                              <span className="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800 flex items-center gap-1 w-fit">
+                                <TrendingDown size={14} />
+                                Stock Bajo
+                              </span>
+                            ) : (
+                              <span className="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800 flex items-center gap-1 w-fit">
+                                <TrendingUp size={14} />
+                                Disponible
+                              </span>
+                            )}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-right">
+                            <div className="flex gap-2 justify-end">
+                              <button
+                                onClick={() => handleEditClick(product)}
+                                className="text-blue-600 hover:text-blue-800 p-2 hover:bg-blue-50 rounded-lg transition-colors"
+                                title="Editar"
+                              >
+                                <Edit2 size={18} />
+                              </button>
+                              <button
+                                onClick={() => handleDelete(product.id)}
+                                className="text-red-600 hover:text-red-800 p-2 hover:bg-red-50 rounded-lg transition-colors"
+                                title="Eliminar"
+                              >
+                                <Trash2 size={18} />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </>
+        ) : (
+          <GestionProveedores />
+        )}
       </div>
 
       {/* MODAL PARA AGREGAR PRODUCTO */}
