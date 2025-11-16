@@ -1,0 +1,25 @@
+services:
+  # Servicio para el Backend (API)
+  - type: web
+    name: mi-api-backend  # Dale un nombre único
+    env: docker          # Especifica que se construye desde un Dockerfile
+    repo: https://github.com/tu-usuario/tu-repositorio.git # Reemplaza con la URL de tu repo
+    rootDir: ./backend   # Le dice a Render que busque el Dockerfile en la carpeta 'backend'
+    plan: free           # Puedes empezar con el plan gratuito
+    healthCheckPath: /   # Opcional: una ruta que Render puede pinguear para saber si tu API está viva
+    envVars:
+      - key: NODE_ENV
+        value: production
+
+  # Servicio para el Frontend (React App)
+  - type: web
+    name: mi-app-frontend # Dale un nombre único
+    env: docker          # También se construye desde un Dockerfile
+    repo: https://github.com/AngelProgramador1/evidencia.git # Reemplaza con la URL de tu repo
+    rootDir: ./frontend  # Le dice a Render que busque el Dockerfile en la carpeta 'frontend'
+    plan: free           # Plan gratuito
+    envVars:
+      - key: REACT_APP_API_URL
+        # Esta es la parte clave: Render automáticamente inyecta la URL del backend.
+        # El formato es el nombre de tu servicio backend (el que pusiste arriba) + ".onrender.com"
+        value: https://mi-api-backend.onrender.com
