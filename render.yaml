@@ -3,7 +3,7 @@ services:
   - type: web
     name: mi-api-backend  # Dale un nombre único
     env: docker          # Especifica que se construye desde un Dockerfile
-    repo: https://github.com/tu-usuario/tu-repositorio.git # Reemplaza con la URL de tu repo
+    repo: https://github.com/AngelProgramador1/evidencia.git # Reemplaza con la URL de tu repo
     rootDir: ./backend   # Le dice a Render que busque el Dockerfile en la carpeta 'backend'
     plan: free           # Puedes empezar con el plan gratuito
     healthCheckPath: /   # Opcional: una ruta que Render puede pinguear para saber si tu API está viva
